@@ -1,6 +1,7 @@
 package org.njit.cs602.server;
 import java.io.*; 
 import java.net.*;
+import java.util.ArrayList;
 
 public class ThreadedDataObjectServer { 
 	public static void main(String[] args ) {
@@ -17,7 +18,7 @@ public class ThreadedDataObjectServer {
 	}
 }
 class ThreadedDataObjectHandler extends Thread {
-	Member member = null;
+	ArrayList<Member> members = null;
 	private Socket incoming; 
 	public ThreadedDataObjectHandler(Socket i) {
 		incoming = i; 
@@ -28,21 +29,12 @@ class ThreadedDataObjectHandler extends Thread {
 					new ObjectInputStream(incoming.getInputStream());
 			ObjectOutputStream out =
 					new ObjectOutputStream(incoming.getOutputStream());
-			member = (Member)in.readObject(); 
-			//System.out.println("Message read: " + member.getMessage());
-			System.out.println("Message read: " + member.getUsername());
-			System.out.println("Message read: " + member.getPassword());
+			members = (ArrayList<Member>)in.readObject(); 
 
-			DbInteraction dbCall = new DbInteraction(member);
-			String dbResp = dbCall.buildQuery();
+			DbInteraction dbCall = new DbInteraction(members);
+			ArrayList<Member> dbResp = dbCall.buildQuery();
 			
-			if(dbResp!=null) {
-				//member.setMessage("success");
-				//member.getMessage();
-				System.out.println("Message written: " + member.getMessage()); 
-			}
-			//System.out.println("Message written: " + member.getMessage()); 
-			out.writeObject(member);
+			out.writeObject(dbResp);
 			in.close();
 			out.close();
 			incoming.close();

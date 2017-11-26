@@ -8,13 +8,12 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -55,19 +54,20 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 	private static JTextField text_full_name, text_email, text_phone_num, text_dob;
 	private static JTextArea text_log;
 	private static JTextArea text_details;
+	private ArrayList<Member> members;
 
 	private JList list;
 	private DefaultListModel listModel;
 
 	public static ArrayList<Member> recordList;
 
-
-	public Design() throws IOException, ClassNotFoundException{
+	public Design(ArrayList<Member> members) throws IOException, ClassNotFoundException{
 		super();
+		this.members=members;
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLayout(new FlowLayout(FlowLayout.LEFT,10,10));
 
-		recordList = readApp();//new ArrayList<Record>();
+		recordList = readApp(this.members);
 		if(recordList == null){
 			recordList = new ArrayList<Member>();
 		}
@@ -176,7 +176,6 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 
 		leftPanel.add(label_member_list);
 
-		;		
 		listModel = new DefaultListModel();
 
 		// inflate listModel
@@ -251,25 +250,58 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 	}
 
 
-	public static ArrayList<Member> readApp()
+	public static ArrayList<Member> readApp(ArrayList<Member> members)
 			throws IOException, ClassNotFoundException {
 
-		File f = new File(storeDir + File.separator + storeFile);
-		ArrayList<Member> gapp = null;
+		//		File f = new File(storeDir + File.separator + storeFile);
+		//		ArrayList<Member> gapp = null;
+		//
+		//		try {
+		//			if( f.length() == 0 ){
+		//				f.createNewFile();
+		//			} else {
+		//				ObjectInputStream ois = new ObjectInputStream(new FileInputStream(f));
+		//				gapp = (ArrayList<Member>) ois.readObject();
+		//			}
+		//		} catch (IOException e) {
+		//			e.printStackTrace();
+		//		}
+		members.get(0).setMessage("load");
+		Client client = new Client(members);
+		ArrayList<Member> memberFromServer = client.startClient();
+		memberFromServer.remove(0);
 
-		try {
-			if( f.length() == 0 ){
-				f.createNewFile();
-			} else {
-				ObjectInputStream ois = new ObjectInputStream(new FileInputStream(f));
-				gapp = (ArrayList<Member>) ois.readObject();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		return gapp;
+		return memberFromServer;
+	}
 
+	public static ArrayList<Member> addMember(ArrayList<Member> members)
+			throws IOException, ClassNotFoundException {
+		members.get(0).setMessage("add");
+		Client client = new Client(members);
+		ArrayList<Member> memberFromServer = client.startClient();
+		memberFromServer.remove(0);
+
+		return memberFromServer;
+	}
+	
+	public static ArrayList<Member> deleteMember(ArrayList<Member> members)
+			throws IOException, ClassNotFoundException {
+		members.get(0).setMessage("delete");
+		Client client = new Client(members);
+		ArrayList<Member> memberFromServer = client.startClient();
+		memberFromServer.remove(0);
+
+		return memberFromServer;
+	}
+	
+	public static ArrayList<Member> updateMember(ArrayList<Member> members)
+			throws IOException, ClassNotFoundException {
+		members.get(0).setMessage("update");
+		Client client = new Client(members);
+		ArrayList<Member> memberFromServer = client.startClient();
+		memberFromServer.remove(0);
+
+		return memberFromServer;
 	}
 
 
@@ -301,7 +333,6 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 			}
 		}
 	}
-
 
 	class DoneListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
@@ -335,10 +366,20 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 			int indexOfEditedMember = list.getSelectedIndex();
 
 			if(newMember.compareTo(recordList.get(indexOfEditedMember)) == 0){
+				
 
 				recordList.get(indexOfEditedMember).setPhoneNo(newMember.getPhoneNo());
 				recordList.get(indexOfEditedMember).setDob(newMember.getDob());
-
+				/*
+				ArrayList<Member> members = new ArrayList<Member>();
+				members.add(recordList.get(indexOfEditedMember));
+				try {
+					updateMember(members);
+				} catch (ClassNotFoundException | IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+*/
 
 			}
 
@@ -372,9 +413,9 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 
 
 			text_details.setText(" Full Name: " + newMember.getFullname()
-					+  "\n Email Address: " + newMember.getEmail() 
-					+ "\n PhoneNo: " + newMember.getPhoneNo()
-					+ "\n DOB: " + newMember.getDob());
+			+  "\n Email Address: " + newMember.getEmail() 
+			+ "\n PhoneNo: " + newMember.getPhoneNo()
+			+ "\n DOB: " + newMember.getDob());
 
 			text_full_name.setText("");
 			text_email.setText("");
@@ -423,7 +464,7 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 			button_edit.setEnabled(false);
 			//getRootPane().setDefaultButton(button_done);
 			text_full_name.requestFocusInWindow();
-			text_log.setText("Select Done to save changes.");
+			//text_log.setText("Select Done to save changes.");
 		}
 	}
 
@@ -439,7 +480,18 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 			}
 
 			int index = list.getSelectedIndex();
+			
 			listModel.remove(index);
+			
+			ArrayList<Member> members = new ArrayList<Member>();
+			members.add(recordList.get(index));
+			try {
+				deleteMember(members);
+			} catch (ClassNotFoundException | IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
 			recordList.remove(index);
 
 			int size = listModel.getSize();
@@ -447,6 +499,7 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 			if (size == 0) { //Nobody's left, disable firing.
 
 				button_delete.setEnabled(false);
+				button_edit.setEnabled(false);
 
 			} else { //Select an index.
 				if (index == listModel.getSize()) {
@@ -464,7 +517,6 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 			text_dob.setText("");	 
 			button_cancel.setEnabled(false);
 			button_done.setEnabled(false);
-			button_edit.setEnabled(false);
 
 		}
 	}
@@ -513,8 +565,18 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 				text_full_name.selectAll();
 				text_log.setText("member already exists in the db.");
 				return;
-			}	            
+			}
 
+			ArrayList<Member> members = new ArrayList<Member>();
+			newMember.setMemberId(new Random().nextInt(1000)+1);
+			System.out.println("****"+newMember.getMemberId());
+			members.add(newMember);
+			try {
+				addMember(members);
+			} catch (ClassNotFoundException | IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			recordList.add(index, newMember);
 
 			listModel.insertElementAt(newMember.getFullname(), index);
@@ -574,5 +636,18 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 			}
 			return false;
 		}
+	}
+	/**
+	 * @return the member
+	 */
+	public ArrayList<Member> getMembers() {
+		return members;
+	}
+
+	/**
+	 * @param member the member to set
+	 */
+	public void setMembers(ArrayList<Member> members) {
+		this.members = members;
 	}
 }

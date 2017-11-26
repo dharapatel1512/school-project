@@ -8,12 +8,14 @@ public class Member extends DataObject implements Comparable<Member>{
 	 */
 	private static final long serialVersionUID = 1L;
 
+	private int memberId;
 	private String username;
 	private String password;
 	private String fullname;
 	private String email;
 	private String phoneNo;
 	private String dob;
+	private String type;
 
 	public Member(String fullname, String email, String phoneNo, String dob) {
 		this.fullname = fullname;
@@ -60,6 +62,17 @@ public class Member extends DataObject implements Comparable<Member>{
 	public void setDob(String dob) {
 		this.dob = dob;
 	}
+	public void setType(String type)
+	{
+		this.type=type;
+	}
+	public String getType()
+	{
+		return type;
+	}
+	
+	
+	
 	@Override
 	public int compareTo(Member oldMember){
 		if (this.fullname.compareToIgnoreCase(oldMember.fullname) != 0){
@@ -70,5 +83,17 @@ public class Member extends DataObject implements Comparable<Member>{
 		}
 		else return 0;
 
+	}
+	/**
+	 * @return the memberId
+	 */
+	public int getMemberId() {
+		return memberId;
+	}
+	/**
+	 * @param memberId the memberId to set
+	 */
+	public void setMemberId(int memberId) {
+		this.memberId = memberId;
 	}
 }

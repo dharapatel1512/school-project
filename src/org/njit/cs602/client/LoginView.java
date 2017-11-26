@@ -7,6 +7,7 @@ import org.njit.cs602.server.Member;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
+import java.util.ArrayList;
 
 
 public class LoginView extends JFrame implements ActionListener
@@ -52,13 +53,15 @@ public class LoginView extends JFrame implements ActionListener
 		String valuePassword=txtPassword.getText();
 		System.out.println(valueUserName);
 		System.out.println(valuePassword);
+		ArrayList<Member> members = new ArrayList<Member>();
 		Member member = new Member();
 		member.setMessage("login");
 		member.setUsername(valueUserName);
 		member.setPassword(valuePassword);
-		Client client = new Client(member);
-		Member memberFromServer = client.startClient();
-		if(memberFromServer.getMessage().equals("success")) {
+		members.add(member);
+		Client client = new Client(members);
+		ArrayList<Member> memberFromServer = client.startClient();
+		if(memberFromServer.get(0).getMessage().equals("success")) {
 			String cmd = e.getActionCommand();
 
 			if(cmd.equals("Open"))
@@ -66,7 +69,7 @@ public class LoginView extends JFrame implements ActionListener
 				dispose();
 				Design design=null;
 				try {
-					design = new Design();
+					design = new Design(members);
 				} catch (ClassNotFoundException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();

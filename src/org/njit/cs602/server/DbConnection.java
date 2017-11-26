@@ -5,18 +5,21 @@ import java.sql.*;
 public class DbConnection {
 
 	// JDBC driver name and database URL
-	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";  
-	static final String DB_URL = "jdbc:mysql://localhost";
-	//static final String DB_URL ="sql.njit.edu";
 
-	//  Database credentials
-	static final String USER = "root";
-	static final String PASS = "dharu1512";
+	/* Connect to AFS Server*/
+	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver"; 
 
+	/*  Database credentials for Local Machine*/
+    static final String DB_URL = "jdbc:mysql://localhost";
+    static final String USER = "root";
+  	static final String PASS = "dharu1512";
+
+	/*Database credentials for AFS*/
+//	static final String DB_URL ="jdbc:mysql://sql1.njit.edu/dp582:3306";
 //	static final String USER = "dp582";
 //	static final String PASS = "7kIDcCk6";
 
-	
+
 	public Connection connection() {
 		Connection conn = null;
 
