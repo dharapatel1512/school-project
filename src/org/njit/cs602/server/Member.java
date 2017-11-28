@@ -71,8 +71,6 @@ public class Member extends DataObject implements Comparable<Member>{
 		return type;
 	}
 	
-	
-	
 	@Override
 	public int compareTo(Member oldMember){
 		if (this.fullname.compareToIgnoreCase(oldMember.fullname) != 0){
@@ -95,5 +93,16 @@ public class Member extends DataObject implements Comparable<Member>{
 	 */
 	public void setMemberId(int memberId) {
 		this.memberId = memberId;
+	}
+	
+	@Override
+	public String toString() {
+		return "Member [memberId=" + memberId + ", username=" + username + ", password=" + password + ", fullname="
+				+ fullname + ", email=" + email + ", phoneNo=" + phoneNo + ", dob=" + dob + ", type=" + type
+				+ ", message=" + message + ", getUsername()=" + getUsername() + ", getPassword()=" + getPassword()
+				+ ", getFullname()=" + getFullname() + ", getEmail()=" + getEmail() + ", getPhoneNo()=" + getPhoneNo()
+				+ ", getDob()=" + getDob() + ", getType()=" + getType() + ", getMemberId()=" + getMemberId()
+				+ ", getMessage()=" + getMessage() + ", getClass()=" + getClass() + ", hashCode()=" + hashCode()
+				+ ", toString()=" + super.toString() + "]";
 	}
 }

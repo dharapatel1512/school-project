@@ -21,7 +21,7 @@ public class DbInteraction {
 
 		switch(members.get(0).getMessage()) {
 		case "login" :
-			PreparedStatement ps=conn.prepareStatement("SELECT username, password, type From member_details.members WHERE username=? AND password=?");
+			PreparedStatement ps=conn.prepareStatement("SELECT member_id, username, password, type From member_details.members WHERE username=? AND password=?");
 			ps.setString(1, this.members.get(0).getUsername());
 			ps.setString(2, this.members.get(0).getPassword());
 
@@ -29,6 +29,7 @@ public class DbInteraction {
 
 			if(rs.next()){
 				//System.out.println("Got it" + rs.getString("username") + rs.getString("password") +rs.getString("type"));
+				this.members.get(0).setMemberId(rs.getInt("member_id"));
 				this.members.get(0).setType(rs.getString("type"));
 				this.members.get(0).setMessage("success");
 				//response="success";
@@ -52,6 +53,7 @@ public class DbInteraction {
 
 			while(rs1.next()){
 				Member member = new Member();
+				member.setMemberId(rs1.getInt("member_id"));
 				member.setFullname(rs1.getString("username"));
 				member.setPassword(rs1.getString("password"));
 				member.setEmail(rs1.getString("email"));
@@ -91,10 +93,14 @@ public class DbInteraction {
 			conn.close();
 			break; // optional
 
-		case "update" :/*
-			PreparedStatement ps3=conn.prepareStatement("UPDATE member_details.members SET username = 'manish' WHERE member_id='2'");
+		case "update" :
+			PreparedStatement ps3=conn.prepareStatement("UPDATE member_details.members SET username =?, email=?, phone_num=? WHERE member_id=?");
 			ps3.setString(1, this.members.get(0).getFullname());
 			ps3.setString(2, this.members.get(0).getEmail());
+			ps3.setString(3, this.members.get(0).getPhoneNo());
+			//ps3.setDate(4, startDate3);
+			ps3.setInt(4, this.members.get(0).getMemberId());
+			System.out.println(this.members.get(0).getMemberId());
 
 			int rs3 = ps3.executeUpdate();
 
@@ -111,6 +117,7 @@ public class DbInteraction {
 		case "delete" :
 			PreparedStatement ps4=conn.prepareStatement("DELETE FROM member_details.members WHERE member_id=?");
 			ps4.setInt(1, this.members.get(0).getMemberId());
+			System.out.println("memberId"+this.members.get(0).getMemberId());
 			int rs4 = ps4.executeUpdate();
 			if(rs4!=0) {
 				System.out.println("Number of rows afftected:"+ rs4);

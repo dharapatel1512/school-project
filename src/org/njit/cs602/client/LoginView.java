@@ -67,9 +67,9 @@ public class LoginView extends JFrame implements ActionListener
 			if(cmd.equals("Open"))
 			{
 				dispose();
-				Design design=null;
+				MainScreen design=null;
 				try {
-					design = new Design(members);
+					design = new MainScreen(members, memberFromServer.get(0));
 				} catch (ClassNotFoundException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -80,7 +80,7 @@ public class LoginView extends JFrame implements ActionListener
 				design.addWindowListener(new java.awt.event.WindowAdapter() {
 			        public void windowClosing(WindowEvent winEvt) {
 			            try {
-							Design.writeApp(Design.recordList);
+							MainScreen.writeApp(MainScreen.recordList);
 						} catch (IOException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -103,6 +103,7 @@ public class LoginView extends JFrame implements ActionListener
 				LoginView frame=new LoginView();
 				frame.setSize(300,100);
 				frame.setVisible(true);
+				frame.setAlwaysOnTop(true);
 
 			}
 

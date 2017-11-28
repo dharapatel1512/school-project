@@ -41,7 +41,7 @@ import org.njit.cs602.server.Member;
  * @author 
  */
 
-public class Design extends JFrame implements ListSelectionListener, Serializable{
+public class MainScreen extends JFrame implements ListSelectionListener, Serializable{
 
 	private static final long serialVersionUID=1L;
 	public static final String storeDir = "Resources";
@@ -49,21 +49,23 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 
 
 
-	private JButton button_add, button_edit, button_delete, button_cancel, button_done;
+	private JButton button_add, button_edit, button_delete, button_cancel, button_done, button_logout;
 	private JLabel label_full_name, label_email, label_phone_num, label_dob, label_member_list;
 	private static JTextField text_full_name, text_email, text_phone_num, text_dob;
 	private static JTextArea text_log;
 	private static JTextArea text_details;
 	private ArrayList<Member> members;
+	private Member member;
 
 	private JList list;
 	private DefaultListModel listModel;
 
 	public static ArrayList<Member> recordList;
 
-	public Design(ArrayList<Member> members) throws IOException, ClassNotFoundException{
+	public MainScreen(ArrayList<Member> members, Member member) throws IOException, ClassNotFoundException{
 		super();
 		this.members=members;
+		this.member = member;
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLayout(new FlowLayout(FlowLayout.LEFT,10,10));
 
@@ -76,9 +78,11 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 		label_email = new JLabel("Enter Email Address:");
 		label_phone_num = new JLabel("Enter Phone No:");
 		label_dob = new JLabel("Enter Date Of Birth:");
-		label_member_list = new JLabel("Member List:");
+		label_member_list = new JLabel("Member List");
 		label_member_list.setFont(new Font("Serif", Font.BOLD, 14));
-		label_member_list.setAlignmentY(BOTTOM_ALIGNMENT);
+		//label_member_list.setAlignmentY(BOTTOM_ALIGNMENT);
+		label_member_list.setAlignmentY(LEFT_ALIGNMENT);
+
 
 		text_full_name = new JTextField("");
 		text_email = new JTextField("");
@@ -90,6 +94,8 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 		button_delete = new JButton("Delete");
 		button_cancel = new JButton("Cancel");
 		button_done = new JButton("Done");
+		button_logout = new JButton("Logout");
+		button_logout.setAlignmentX(RIGHT_ALIGNMENT);
 
 
 		HireListener hireListener = new HireListener(button_add);
@@ -108,6 +114,7 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 		button_edit.addActionListener(new EditListener());
 		button_cancel.addActionListener(new CancelListener());
 		button_done.addActionListener(new DoneListener());
+		button_logout.addActionListener(new LogoutListner());
 
 		button_done.setEnabled(false);
 		button_cancel.setEnabled(false);
@@ -150,21 +157,27 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 		rightPanel.add(text_phone_num);
 		rightPanel.add(label_dob);
 		rightPanel.add(text_dob);
+
 		rightPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));		
 
 		JPanel mainRightPanel = new JPanel();
 		mainRightPanel.setLayout(new BoxLayout(mainRightPanel,BoxLayout.Y_AXIS));
 		mainRightPanel.add(topRight);
-		mainRightPanel.add(rightPanel);
+		if(this.member.getType().equalsIgnoreCase("admin")) {
+			mainRightPanel.add(rightPanel);
+		}
 		mainRightPanel.add(bottomRight);
 
 		JPanel buttonPane = new JPanel();
 		buttonPane.setLayout(new BoxLayout(buttonPane,BoxLayout.LINE_AXIS));
-		buttonPane.add(button_cancel);
-		buttonPane.add(Box.createHorizontalStrut(5));
-		buttonPane.add(button_done);
-		buttonPane.add(Box.createHorizontalStrut(5));
-		buttonPane.add(button_add);
+		if(this.member.getType().equalsIgnoreCase("admin")) {
+			buttonPane.add(button_cancel);
+			buttonPane.add(Box.createHorizontalStrut(5));
+			buttonPane.add(button_done);
+			buttonPane.add(Box.createHorizontalStrut(5));
+			buttonPane.add(button_add);
+		}
+		buttonPane.add(button_logout);
 		buttonPane.setBorder(BorderFactory.createEmptyBorder(10,5,5,5));
 
 		mainRightPanel.add(buttonPane);
@@ -172,9 +185,10 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 		/* Panel on the left half of the base container*/
 
 		JPanel leftPanel = new JPanel();
+		leftPanel.add(label_member_list);	
 		leftPanel.setLayout(new BoxLayout(leftPanel,BoxLayout.Y_AXIS));
 
-		leftPanel.add(label_member_list);
+
 
 		listModel = new DefaultListModel();
 
@@ -203,14 +217,16 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 		JPanel leftButtonPane = new JPanel();
 		leftButtonPane.setLayout(new BoxLayout(leftButtonPane,
 				BoxLayout.LINE_AXIS));
+
 		leftButtonPane.add(button_delete);
 		leftButtonPane.add(Box.createHorizontalStrut(5));
 		leftButtonPane.add(new JSeparator(SwingConstants.VERTICAL));
 		leftButtonPane.add(button_edit);
 		leftButtonPane.add(Box.createHorizontalStrut(5));
 		leftButtonPane.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-
-		leftPanel.add(leftButtonPane);
+		if(this.member.getType().equalsIgnoreCase("admin")) {
+			leftPanel.add(leftButtonPane);
+		}
 
 		add(leftPanel);
 		add(mainRightPanel);
@@ -283,17 +299,17 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 
 		return memberFromServer;
 	}
-	
+
 	public static ArrayList<Member> deleteMember(ArrayList<Member> members)
 			throws IOException, ClassNotFoundException {
-		members.get(0).setMessage("delete");
+		members.get(0).setMessage("delete");		
 		Client client = new Client(members);
 		ArrayList<Member> memberFromServer = client.startClient();
 		memberFromServer.remove(0);
 
 		return memberFromServer;
 	}
-	
+
 	public static ArrayList<Member> updateMember(ArrayList<Member> members)
 			throws IOException, ClassNotFoundException {
 		members.get(0).setMessage("update");
@@ -321,6 +337,7 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 
 				//System.out.println("shootfsafa" + list.getSelectedIndex());
 				String member,email,phone,dob;
+				int memberId;
 
 				member = recordList.get(list.getSelectedIndex()).getFullname();
 				email = recordList.get(list.getSelectedIndex()).getEmail();
@@ -334,8 +351,16 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 		}
 	}
 
+	class LogoutListner implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			dispose();
+			new LoginView().main(null);
+		}
+	}
+
 	class DoneListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
+
 
 			if(listModel.size() ==0){
 				return;
@@ -365,13 +390,15 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 
 			int indexOfEditedMember = list.getSelectedIndex();
 
+			System.out.println("####"+newMember.compareTo(recordList.get(indexOfEditedMember)));
 			if(newMember.compareTo(recordList.get(indexOfEditedMember)) == 0){
-				
 
+				newMember.setMemberId(recordList.get(indexOfEditedMember).getMemberId());
 				recordList.get(indexOfEditedMember).setPhoneNo(newMember.getPhoneNo());
 				recordList.get(indexOfEditedMember).setDob(newMember.getDob());
-				/*
+
 				ArrayList<Member> members = new ArrayList<Member>();
+
 				members.add(recordList.get(indexOfEditedMember));
 				try {
 					updateMember(members);
@@ -379,7 +406,7 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-*/
+
 
 			}
 
@@ -390,20 +417,45 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 					Toolkit.getDefaultToolkit().beep();
 					text_full_name.requestFocusInWindow();
 					text_full_name.selectAll();
-					text_log.setText("member already exists in the db.");
+					//text_log.setText("member already exists in the db.");
 					return;
 				}
 				else{
 					if(index <= indexOfEditedMember){
+						newMember.setMemberId(recordList.get(indexOfEditedMember).getMemberId());
 						recordList.remove(indexOfEditedMember);
 						listModel.remove(indexOfEditedMember);
+
 						recordList.add(index, newMember);
+
+						ArrayList<Member> members = new ArrayList<Member>();
+
+						members.add(recordList.get(index));
+						try {
+							updateMember(members);
+						} catch (ClassNotFoundException | IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+
 						listModel.add(index, newMember.getFullname());
 						list.setSelectedIndex(index);
 					}
 					else{
+						newMember.setMemberId(recordList.get(indexOfEditedMember).getMemberId());
 						recordList.add(index, newMember);
 						listModel.add(index, newMember.getFullname());
+
+						ArrayList<Member> members = new ArrayList<Member>();
+
+						members.add(recordList.get(index));
+						try {
+							updateMember(members);
+						} catch (ClassNotFoundException | IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+
 						recordList.remove(indexOfEditedMember);
 						listModel.remove(indexOfEditedMember);
 						list.setSelectedIndex(index-1);
@@ -426,12 +478,14 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 			button_done.setEnabled(false);
 			button_edit.setEnabled(true);
 			text_log.setText("Successfully edited!");
+			list.enable();
 
 		}
 	}
 
 	class CancelListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
+
 
 			text_full_name.setText("");
 			text_email.setText("");
@@ -442,6 +496,7 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 			button_done.setEnabled(false);
 			button_edit.setEnabled(true);
 			text_log.setText("");
+			list.enable();
 		}
 	}
 
@@ -449,11 +504,13 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 	class EditListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 
+			text_log.setText("");
 			if(listModel.size() ==0){
 				return;
 			}
 
 			int index = list.getSelectedIndex();
+			list.disable();
 			text_full_name.setText(recordList.get(index).getFullname());
 			text_email.setText(recordList.get(index).getEmail());
 			text_phone_num.setText(recordList.get(index).getPhoneNo());
@@ -464,6 +521,7 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 			button_edit.setEnabled(false);
 			//getRootPane().setDefaultButton(button_done);
 			text_full_name.requestFocusInWindow();
+
 			//text_log.setText("Select Done to save changes.");
 		}
 	}
@@ -479,10 +537,11 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 				return;
 			}
 
+			list.enable();
 			int index = list.getSelectedIndex();
-			
+
 			listModel.remove(index);
-			
+
 			ArrayList<Member> members = new ArrayList<Member>();
 			members.add(recordList.get(index));
 			try {
@@ -491,7 +550,7 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			
+
 			recordList.remove(index);
 
 			int size = listModel.getSize();
@@ -536,6 +595,7 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 		//Required by ActionListener.
 		public void actionPerformed(ActionEvent e) {
 
+
 			Member newMember = new Member(text_full_name.getText().trim(),
 					text_email.getText().trim(),text_phone_num.getText().trim(),
 					text_dob.getText().trim());
@@ -563,13 +623,13 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 				Toolkit.getDefaultToolkit().beep();
 				text_full_name.requestFocusInWindow();
 				text_full_name.selectAll();
-				text_log.setText("member already exists in the db.");
+				//text_log.setText("member already exists in the db.");
 				return;
 			}
 
 			ArrayList<Member> members = new ArrayList<Member>();
 			newMember.setMemberId(new Random().nextInt(1000)+1);
-			System.out.println("****"+newMember.getMemberId());
+
 			members.add(newMember);
 			try {
 				addMember(members);
@@ -590,7 +650,7 @@ public class Design extends JFrame implements ListSelectionListener, Serializabl
 			text_phone_num.setText("");
 			text_dob.setText("");
 			text_log.setText("Successfully added! ");
-
+			list.enable();
 			//Select the new item and make it visible.
 			list.setSelectedIndex(index);
 			list.ensureIndexIsVisible(index);
