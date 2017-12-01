@@ -1,4 +1,4 @@
-package org.njit.cs602.client;
+package client;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -35,7 +35,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.njit.cs602.server.Member;
+import server.Member;
 
 /**
  * @author 

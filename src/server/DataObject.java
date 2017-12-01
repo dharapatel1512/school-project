@@ -1,4 +1,4 @@
-package org.njit.cs602.client;
+package server;
 import java.io.Serializable;
 
 public class DataObject implements Serializable{

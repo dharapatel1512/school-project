@@ -1,4 +1,4 @@
-package org.njit.cs602.server;
+package server;
 import java.io.*; 
 import java.net.*;
 import java.util.ArrayList;
@@ -23,6 +23,7 @@ class ThreadedDataObjectHandler extends Thread {
 	public ThreadedDataObjectHandler(Socket i) {
 		incoming = i; 
 	}
+	@SuppressWarnings("unchecked")
 	public void run() { 
 		try {
 			ObjectInputStream in =

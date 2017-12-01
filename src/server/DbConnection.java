@@ -1,4 +1,4 @@
-package org.njit.cs602.server;
+package server;
 
 import java.sql.*;
 
@@ -15,7 +15,7 @@ public class DbConnection {
   	static final String PASS = "dharu1512";
 
 	/*Database credentials for AFS*/
-//	static final String DB_URL ="jdbc:mysql://sql1.njit.edu/dp582:3306";
+//	static final String DB_URL ="jdbc:mysql://sql1.njit.edu/dp582";
 //	static final String USER = "dp582";
 //	static final String PASS = "7kIDcCk6";
 

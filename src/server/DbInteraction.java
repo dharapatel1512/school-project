@@ -1,4 +1,4 @@
-package org.njit.cs602.server;
+package server;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,7 +21,7 @@ public class DbInteraction {
 
 		switch(members.get(0).getMessage()) {
 		case "login" :
-			PreparedStatement ps=conn.prepareStatement("SELECT member_id, username, password, type From member_details.members WHERE username=? AND password=?");
+			PreparedStatement ps=conn.prepareStatement("SELECT member_id, username, password, type From member_details.Members WHERE username=? AND password=?");
 			ps.setString(1, this.members.get(0).getUsername());
 			ps.setString(2, this.members.get(0).getPassword());
 

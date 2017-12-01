@@ -1,8 +1,8 @@
-package org.njit.cs602.client;
+package client;
 
 import javax.swing.*;
 
-import org.njit.cs602.server.Member;
+import server.Member;
 
 import java.awt.*;
 import java.awt.event.*;

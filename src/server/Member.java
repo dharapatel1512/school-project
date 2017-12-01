@@ -1,4 +1,4 @@
-package org.njit.cs602.server;
+package server;
 
 
 public class Member extends DataObject implements Comparable<Member>{
