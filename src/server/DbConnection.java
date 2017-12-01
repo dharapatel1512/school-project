@@ -9,15 +9,15 @@ public class DbConnection {
 	/* Connect to AFS Server*/
 	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver"; 
 
-	/*  Database credentials for Local Machine*/
+	/*  Database credentials for Local Machine
     static final String DB_URL = "jdbc:mysql://localhost";
     static final String USER = "root";
-  	static final String PASS = "dharu1512";
+  	static final String PASS = "dharu1512";*/
 
 	/*Database credentials for AFS*/
-//	static final String DB_URL ="jdbc:mysql://sql1.njit.edu/dp582";
-//	static final String USER = "dp582";
-//	static final String PASS = "7kIDcCk6";
+	static final String DB_URL ="jdbc:mysql://sql1.njit.edu/dp582";
+	static final String USER = "dp582";
+	static final String PASS = "7kIDcCk6";
 
 
 	public Connection connection() {

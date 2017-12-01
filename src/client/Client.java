@@ -17,8 +17,8 @@ public class Client {
 	public ArrayList<Member> startClient() {
 		try{
 			//System.out.println("Message sent : " + this.member.getMessage()); 
-			//Socket socketToServer = new Socket("afs4.njit.edu", 3000);
-			 Socket socketToServer = new Socket("localhost", 3000); 
+			Socket socketToServer = new Socket("afs4.njit.edu", 3003);
+			//Socket socketToServer = new Socket("localhost", 3000); 
 
 			ObjectOutputStream outToServer =
 					new ObjectOutputStream(socketToServer.getOutputStream()); 

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 public class ThreadedDataObjectServer { 
 	public static void main(String[] args ) {
 		try {
-			ServerSocket s = new ServerSocket(3000); 
+			ServerSocket s = new ServerSocket(3003); 
 			while(true) {
 				Socket incoming = s.accept( );
 				new ThreadedDataObjectHandler(incoming).start();
