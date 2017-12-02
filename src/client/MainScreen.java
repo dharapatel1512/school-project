@@ -7,10 +7,6 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Random;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -32,6 +28,11 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import java.io.Serializable;
+
+import java.util.ArrayList;
+import java.util.Random;
+
 import server.Member;
 
 /**
@@ -39,11 +40,9 @@ import server.Member;
  */
 
 public class MainScreen extends JFrame implements ListSelectionListener, Serializable{
-
 	private static final long serialVersionUID=1L;
 	public static final String storeDir = "Resources";
 	public static final String storeFile = "MemberRecord.txt";
-
 	private JButton button_add, button_edit, button_delete, button_cancel, button_done, button_logout;
 	private JLabel label_full_name, label_email, label_phone_num, label_dob, label_member_list;
 	private static JTextField text_full_name, text_email, text_phone_num, text_dob;
@@ -51,14 +50,12 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 	private static JTextArea text_details;
 	private ArrayList<Member> members;
 	private Member member;
-
-	private JList list;
-	private DefaultListModel listModel;
-
+	private JList<String> list;
+	private DefaultListModel<String> listModel;
 	public static ArrayList<Member> recordList;
 
-	public MainScreen(ArrayList<Member> members, Member member) throws IOException, ClassNotFoundException{
-		super();
+	public MainScreen(ArrayList<Member> members, Member member){
+		super("Member Administration System");
 		this.members=members;
 		this.member = member;
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -77,7 +74,6 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 		label_member_list.setFont(new Font("Serif", Font.BOLD, 14));
 		label_member_list.setAlignmentY(LEFT_ALIGNMENT);
 
-
 		text_full_name = new JTextField("");
 		text_email = new JTextField("");
 		text_phone_num = new JTextField("");
@@ -91,18 +87,13 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 		button_logout = new JButton("Logout");
 		button_logout.setAlignmentX(RIGHT_ALIGNMENT);
 
-
 		HireListener hireListener = new HireListener(button_add);
-
 		button_add.addActionListener(hireListener);
 		button_add.setEnabled(false);
-
 		text_full_name.getDocument().addDocumentListener(hireListener);
-
 		text_email.getDocument().addDocumentListener(hireListener);
 		text_phone_num.addActionListener(hireListener);
 		text_dob.addActionListener(hireListener);
-
 
 		button_delete.addActionListener(new FireListener());
 		button_edit.addActionListener(new EditListener());
@@ -118,31 +109,51 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 			button_edit.setEnabled(false);
 		}
 
+		JPanel topRight = createTopRight();
+		JPanel bottomRight = createBottomRight();
+		JPanel rightPanel = createRightPanel();
+		JPanel mainRightPanel = createMainRightPanel(topRight, rightPanel, bottomRight);
+		JPanel leftPanel = createLeftPanel();
+		JPanel leftButtonPane = createLeftButtonPane();
 
-		text_details = new JTextArea(4,28);
-		text_details.setEditable(false);
+		if(this.member.getType().equalsIgnoreCase("admin")) {
+			leftPanel.add(leftButtonPane);
+		}
+
+		add(leftPanel);
+		add(mainRightPanel);
+
+		pack();
+		setVisible(true);
+	}
+
+	private JPanel createTopRight() {
 		JPanel topRight = new JPanel();
 		topRight.setBorder(BorderFactory.createTitledBorder("Member Details"));
+		text_details = new JTextArea(4,28);
+		text_details.setEditable(false);
 		text_details.setFont(new Font("Serif", Font.ITALIC, 14));
 		text_details.setBackground(getBackground());
-		topRight.add(text_details);
-
-
-		text_log = new JTextArea(1,28);
 		text_details.setEditable(false);
+		topRight.add(text_details);
+		return topRight;
+	}
+
+	private JPanel createBottomRight() {
 		JPanel bottomRight = new JPanel();
 		bottomRight.setBorder(BorderFactory.createTitledBorder("Log"));
+		text_log = new JTextArea(1,28);
 		text_log.setBackground(getForeground());
 		text_log.setFont(new Font("Serif", Font.ITALIC, 14));
 		text_log.setText("");
 		text_log.setEditable(false);
 		bottomRight.add(text_log);
+		return bottomRight;
+	}
 
-
-		/* Panel on the right half of the base container*/
-
+	/* Panel on the right half of the base container*/
+	private JPanel createRightPanel() {
 		JPanel rightPanel = new JPanel(new GridLayout(0,2));
-
 		rightPanel.add(label_full_name);
 		rightPanel.add(text_full_name);
 		rightPanel.add(label_email);
@@ -151,17 +162,11 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 		rightPanel.add(text_phone_num);
 		rightPanel.add(label_dob);
 		rightPanel.add(text_dob);
+		rightPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+		return rightPanel;		
+	}
 
-		rightPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));		
-
-		JPanel mainRightPanel = new JPanel();
-		mainRightPanel.setLayout(new BoxLayout(mainRightPanel,BoxLayout.Y_AXIS));
-		mainRightPanel.add(topRight);
-		if(this.member.getType().equalsIgnoreCase("admin")) {
-			mainRightPanel.add(rightPanel);
-		}
-		mainRightPanel.add(bottomRight);
-
+	private JPanel createButtonPane() {
 		JPanel buttonPane = new JPanel();
 		buttonPane.setLayout(new BoxLayout(buttonPane,BoxLayout.LINE_AXIS));
 		if(this.member.getType().equalsIgnoreCase("admin")) {
@@ -173,18 +178,15 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 		}
 		buttonPane.add(button_logout);
 		buttonPane.setBorder(BorderFactory.createEmptyBorder(10,5,5,5));
+		return buttonPane;
+	}
 
-		mainRightPanel.add(buttonPane);
-
-		/* Panel on the left half of the base container*/
-
+	private JPanel createLeftPanel() {
 		JPanel leftPanel = new JPanel();
 		leftPanel.add(label_member_list);	
 		leftPanel.setLayout(new BoxLayout(leftPanel,BoxLayout.Y_AXIS));
 
-
-
-		listModel = new DefaultListModel();
+		listModel = new DefaultListModel<String>();
 
 		// inflate listModel
 		for(int j =0; j<recordList.size(); j++){
@@ -194,8 +196,7 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 			text_details.setText(" Full Name: " + recordList.get(0).getFullname() +  "\n Email Adddress: " + recordList.get(0).getEmail() + "\n  PhoneNo: " + recordList.get(0).getPhoneNo() + "\n  DOB: " + recordList.get(0).getDob());
 		}
 
-
-		list = new JList(listModel);
+		list = new JList<String>(listModel);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.setSelectedIndex(0);
 		list.addListSelectionListener(this);
@@ -204,10 +205,12 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 		JScrollPane listScrollPane = new JScrollPane(list, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		listScrollPane.setPreferredSize(new Dimension(200,280));
 
-
 		leftPanel.add(listScrollPane);
+		return leftPanel;
+	}
 
-
+	/* Panel on the left half of the base container*/
+	private JPanel createLeftButtonPane() {
 		JPanel leftButtonPane = new JPanel();
 		leftButtonPane.setLayout(new BoxLayout(leftButtonPane,
 				BoxLayout.LINE_AXIS));
@@ -218,67 +221,39 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 		leftButtonPane.add(button_edit);
 		leftButtonPane.add(Box.createHorizontalStrut(5));
 		leftButtonPane.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+		return leftButtonPane;
+	}
+
+	private JPanel createMainRightPanel(JPanel topRight, JPanel rightPanel, JPanel bottomRight) {
+		JPanel mainRightPanel = new JPanel();
+		mainRightPanel.setLayout(new BoxLayout(mainRightPanel,BoxLayout.Y_AXIS));
+		mainRightPanel.add(topRight);
 		if(this.member.getType().equalsIgnoreCase("admin")) {
-			leftPanel.add(leftButtonPane);
+			mainRightPanel.add(rightPanel);
 		}
+		mainRightPanel.add(bottomRight);
 
-		add(leftPanel);
-		add(mainRightPanel);
+		JPanel buttonPane = createButtonPane();
 
-
-		pack();
-		setVisible(true);
-
+		mainRightPanel.add(buttonPane);
+		return mainRightPanel;
 	}
 
-	public int getIndex(Member newMember){
-
-		int index = 0;
-		if(recordList.size() >0){
-
-			Member oldMember = recordList.get(index);
-
-			while (newMember.compareTo(oldMember) > 0 && index < recordList.size()){
-				oldMember = recordList.get(index);
-				index++;
-			}
-			if (newMember.compareTo(oldMember) <0 && index != 0){
-				index--;
-			}
-			if (newMember.compareTo(oldMember) == 0){
-				return -1;
-			}
-		}
-		return index;
-	}
-
-
-	//This method is required by ListSelectionListener.
+	@Override	//This method is required by ListSelectionListener.
 	public void valueChanged(ListSelectionEvent e) {
 		if (e.getValueIsAdjusting() == false) {
 
 			if (list.getSelectedIndex() == -1) {
-				//No selection, disable fire button.
-				// button_delete.setEnabled(false);
 				text_details.setText("");
-				//System.out.println("shoot" + list.getSelectedIndex());
 
 			} else {
-				//Selection, enable the fire button.
-				//fireButton.setEnabled(true);
-
-				//System.out.println("shootfsafa" + list.getSelectedIndex());
 				String member,email,phone,dob;
-				int memberId;
-
 				member = recordList.get(list.getSelectedIndex()).getFullname();
 				email = recordList.get(list.getSelectedIndex()).getEmail();
 				phone = recordList.get(list.getSelectedIndex()).getPhoneNo();
 				dob =recordList.get(list.getSelectedIndex()).getDob();
 
 				text_details.setText(" Full Name: " + member +  "\n Email: " + email + "\n PhoneNo : " + phone + "\n DOB: " + dob);
-
-
 			}
 		}
 	}
@@ -292,12 +267,9 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 
 	class DoneListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-
-
 			if(listModel.size() ==0){
 				return;
 			}
-
 
 			Member newMember = new Member(text_full_name.getText().trim(),
 					text_email.getText().trim(),text_phone_num.getText().trim(),
@@ -334,12 +306,10 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 
 				ClientUtil.actionPerform(members, "update");
 
-
-
 			}
 
 			else{
-				int index = getIndex(newMember);
+				int index = ClientUtil.getIndex(recordList, newMember);
 
 				if (index ==-1) {
 					Toolkit.getDefaultToolkit().beep();
@@ -377,7 +347,6 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 
 						ClientUtil.actionPerform(members, "update");
 
-
 						recordList.remove(indexOfEditedMember);
 						listModel.remove(indexOfEditedMember);
 						list.setSelectedIndex(index-1);
@@ -385,54 +354,42 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 				}
 			}
 
-
 			text_details.setText(" Full Name: " + newMember.getFullname()
 			+  "\n Email Address: " + newMember.getEmail() 
 			+ "\n PhoneNo: " + newMember.getPhoneNo()
 			+ "\n DOB: " + newMember.getDob());
 
-			text_full_name.setText("");
-			text_email.setText("");
-			text_phone_num.setText("");
-			text_dob.setText("");	 
-
+			resetTextFields();	 
 			button_cancel.setEnabled(false);
 			button_done.setEnabled(false);
 			button_edit.setEnabled(true);
 			text_log.setText("Successfully edited!");
-			list.enable();
+			list.setEnabled(true);
 
 		}
 	}
 
 	class CancelListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-
-
-			text_full_name.setText("");
-			text_email.setText("");
-			text_phone_num.setText("");
-			text_dob.setText("");	 
-
+			resetTextFields(); 
 			button_cancel.setEnabled(false);
 			button_done.setEnabled(false);
 			button_edit.setEnabled(true);
 			text_log.setText("");
-			list.enable();
+			list.setEnabled(true);
 		}
 	}
 
 
 	class EditListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-
 			text_log.setText("");
 			if(listModel.size() ==0){
 				return;
 			}
 
 			int index = list.getSelectedIndex();
-			list.disable();
+			list.setEnabled(false);
 			text_full_name.setText(recordList.get(index).getFullname());
 			text_email.setText(recordList.get(index).getEmail());
 			text_phone_num.setText(recordList.get(index).getPhoneNo());
@@ -441,25 +398,21 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 			button_cancel.setEnabled(true);
 			button_done.setEnabled(true);
 			button_edit.setEnabled(false);
-			//getRootPane().setDefaultButton(button_done);
+
 			text_full_name.requestFocusInWindow();
 
-			//text_log.setText("Select Done to save changes.");
+			text_log.setText("Select Done to save changes.");
 		}
 	}
 
-
+	//This method can be called only if there's a valid selection to remove whatever's selected.
 	class FireListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-			//This method can be called only if
-			//there's a valid selection
-			//so go ahead and remove whatever's selected.
-
 			if(listModel.size() ==0){
 				return;
 			}
 
-			list.enable();
+			list.setEnabled(true);
 			int index = list.getSelectedIndex();
 
 			listModel.remove(index);
@@ -468,7 +421,6 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 			members.add(recordList.get(index));
 
 			ClientUtil.actionPerform(members, "delete");
-
 
 			recordList.remove(index);
 
@@ -489,23 +441,16 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 				list.ensureIndexIsVisible(index);
 			}
 			text_log.setText("Successfully deleted!");
-			text_full_name.setText("");
-			text_email.setText("");
-			text_phone_num.setText("");
-			text_dob.setText("");	 
+			resetTextFields(); 
 			button_cancel.setEnabled(false);
 			button_done.setEnabled(false);
-
 		}
 	}
 
-
-
-
 	//This listener is shared by the text field and the hire button.
 	class HireListener implements ActionListener, DocumentListener {
-		private boolean alreadyEnabled = false;
 		private JButton button;
+		private boolean alreadyEnabled = false;
 
 		public HireListener(JButton button) {
 			this.button = button;
@@ -513,8 +458,6 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 
 		//Required by ActionListener.
 		public void actionPerformed(ActionEvent e) {
-
-
 			Member newMember = new Member(text_full_name.getText().trim(),
 					text_email.getText().trim(),text_phone_num.getText().trim(),
 					text_dob.getText().trim());
@@ -536,13 +479,13 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 				return;
 			}
 
-			int index = getIndex(newMember);
+			int index = ClientUtil.getIndex(recordList, newMember);
 
 			if (index ==-1) {
 				Toolkit.getDefaultToolkit().beep();
 				text_full_name.requestFocusInWindow();
 				text_full_name.selectAll();
-				//text_log.setText("member already exists in the db.");
+				text_log.setText("Member already exists in the db.");
 				return;
 			}
 
@@ -556,17 +499,14 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 			recordList.add(index, newMember);
 
 			listModel.insertElementAt(newMember.getFullname(), index);
-			//If we just wanted to add to the end, we'd do this:
-			//listModel.addElement(employeeName.getText());
+			//If we just wanted to add to the end, we'd use below statement: 
+			//listModel.addElement(newMember.getFullname());
 
 			//Reset the text field.
 			text_full_name.requestFocusInWindow();
-			text_full_name.setText("");
-			text_email.setText("");
-			text_phone_num.setText("");
-			text_dob.setText("");
+			resetTextFields();
 			text_log.setText("Successfully added! ");
-			list.enable();
+			list.setEnabled(true);
 			//Select the new item and make it visible.
 			list.setSelectedIndex(index);
 			list.ensureIndexIsVisible(index);
@@ -580,27 +520,20 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 			}
 		}
 
-		//Required by DocumentListener.
+		@Override	//Required by DocumentListener.
 		public void insertUpdate(DocumentEvent e) {
-			enableButton();
+			ClientUtil.enableButton(button, alreadyEnabled);
 		}
 
-		//Required by DocumentListener.
+		@Override	//Required by DocumentListener.
 		public void removeUpdate(DocumentEvent e) {
 			handleEmptyTextField(e);
 		}
 
-		//Required by DocumentListener.
+		@Override	//Required by DocumentListener.
 		public void changedUpdate(DocumentEvent e) {
 			if (!handleEmptyTextField(e)) {
-				enableButton();
-			}
-		}
-
-		private void enableButton() {
-			if (!alreadyEnabled) {
-				button.setEnabled(true);
-				button.setFocusPainted(true);
+				ClientUtil.enableButton(button, alreadyEnabled);
 			}
 		}
 
@@ -612,5 +545,12 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 			}
 			return false;
 		}
+	}
+
+	public void resetTextFields() {
+		text_full_name.setText("");
+		text_email.setText("");
+		text_phone_num.setText("");
+		text_dob.setText("");
 	}
 }
