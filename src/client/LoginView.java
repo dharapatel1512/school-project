@@ -10,44 +10,48 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 
-public class LoginView extends JFrame implements ActionListener
-{
-	JButton btnLogIn;
+public class LoginView extends JFrame implements ActionListener{
+	private static final long serialVersionUID = 1L;
+	JButton btnLogIn, btnClear;
 	JPanel panel;
 	JLabel lblUserName,lblPassword;
 	final JTextField  txtUserName,txtPassword;
 
-	public LoginView()
-	{
+	public LoginView(){
 		super("Member Administration System");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+		
 		lblUserName = new JLabel();
-		lblUserName.setText("Username:");
-		txtUserName = new JTextField(10);
-
+		txtUserName = new JTextField(15);
 		lblPassword = new JLabel();
-		lblPassword.setText("Password:");
-		txtPassword = new JPasswordField(10);
-
+		txtPassword = new JPasswordField(15);
 		btnLogIn=new JButton("LogIn");
-
+		btnClear=new JButton("Clear");
+		initializeLoginScreen();
+		btnLogIn.addActionListener(this);
+		btnLogIn.setActionCommand("Open");
+		btnClear.addActionListener(new Clearistner());
+	}
+	
+	public void initializeLoginScreen() {
+		lblUserName.setText("Username:");
+		lblPassword.setText("Password:");
+		
 		panel=new JPanel(new GridLayout(3,1));
 		panel.add(lblUserName);
 		panel.add(txtUserName);
 		panel.add(lblPassword);
 		panel.add(txtPassword);
 		panel.add(btnLogIn);
+		panel.add(btnClear);
 
-		btnLogIn.addActionListener(this);
-		btnLogIn.setActionCommand("Open");
-		add(panel,BorderLayout.CENTER);
+		this.add(panel,BorderLayout.CENTER);
 		pack();
-
+		
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e)
+	public void actionPerformed(ActionEvent event)
 	{
 		String valueUserName=txtUserName.getText();
 		String valuePassword=txtPassword.getText();
@@ -62,7 +66,7 @@ public class LoginView extends JFrame implements ActionListener
 		Client client = new Client(members);
 		ArrayList<Member> memberFromServer = client.startClient();
 		if(memberFromServer.get(0).getMessage().equals("success")) {
-			String cmd = e.getActionCommand();
+			String cmd = event.getActionCommand();
 
 			if(cmd.equals("Open"))
 			{
@@ -70,44 +74,24 @@ public class LoginView extends JFrame implements ActionListener
 				MainScreen design=null;
 				try {
 					design = new MainScreen(members, memberFromServer.get(0));
-				} catch (ClassNotFoundException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+				} catch (ClassNotFoundException | IOException e) {
+					e.printStackTrace();
 				}
 				design.addWindowListener(new java.awt.event.WindowAdapter() {
-			        public void windowClosing(WindowEvent winEvt) {
-			            try {
-							MainScreen.writeApp(MainScreen.recordList);
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-			            System.exit(0);
-			        }
+					public void windowClosing(WindowEvent winEvt) {			            
+						ClientUtil.closeTheWindow();
+					}
 				});
-			        
+
 			}
 		}
 	}
-
-	public static void main(String[] args)
-	{
-		SwingUtilities.invokeLater(new Runnable(){
-
-			@Override
-			public void run()
-			{
-				LoginView frame=new LoginView();
-				frame.setSize(300,100);
-				frame.setVisible(true);
-				frame.setAlwaysOnTop(true);
-
-			}
-
-		});
+	
+	class Clearistner implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			txtUserName.setText(null);
+			txtPassword.setText(null);
+		}
 	}
 }
 

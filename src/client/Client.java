@@ -1,9 +1,13 @@
 package client;
 
+import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+
+import javax.swing.SwingUtilities;
 
 import server.Member;
 
@@ -15,25 +19,49 @@ public class Client {
 	}
 
 	public ArrayList<Member> startClient() {
-		try{
-			//System.out.println("Message sent : " + this.member.getMessage()); 
-			Socket socketToServer = new Socket("afs4.njit.edu", 3003);
-			//Socket socketToServer = new Socket("localhost", 3000); 
+		Socket socketToServer = null;
+		ObjectOutputStream outToServer = null;
+		ObjectInputStream inFromServer = null;
 
-			ObjectOutputStream outToServer =
-					new ObjectOutputStream(socketToServer.getOutputStream()); 
-			ObjectInputStream inFromServer =
-					new ObjectInputStream(socketToServer.getInputStream()); 
+		try {
+			socketToServer = new Socket("localhost", 3003); 
+			//Socket socketToServer = new Socket("afs4.njit.edu", 3003);
+			outToServer = new ObjectOutputStream(socketToServer.getOutputStream());
+			inFromServer = new ObjectInputStream(socketToServer.getInputStream()); 
 			outToServer.writeObject(this.members);
 			this.members = (ArrayList<Member>) inFromServer.readObject();
 			outToServer.close(); 
 			inFromServer.close(); 
 			socketToServer.close();
+		} catch (ClassNotFoundException | IOException e) {
+			
+			System.out.println("Server Connection is closed now. Thank you :)");
 		}
-		catch(Exception e){
-			System.out.println(e);
-		}
+
 		return this.members;
+	}
+	
+	public static void main(String[] args)
+	{
+		SwingUtilities.invokeLater(new Runnable(){
+
+			@Override
+			public void run()
+			{
+				LoginView frame=new LoginView();
+				frame.setSize(350,100);
+				frame.setVisible(true);
+				frame.setAlwaysOnTop(true);
+
+				frame.addWindowListener(new java.awt.event.WindowAdapter() {
+					public void windowClosing(WindowEvent winEvt) {
+						ClientUtil.closeTheWindow();
+					}
+				});
+
+			}
+
+		});
 	}
 
 }

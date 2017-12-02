@@ -1,22 +1,26 @@
 package server;
 import java.io.*; 
 import java.net.*;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class ThreadedDataObjectServer { 
 	public static void main(String[] args ) {
+
 		try {
-			ServerSocket s = new ServerSocket(3003); 
+			ServerSocket serverSocket = new ServerSocket(3003); 
 			while(true) {
-				Socket incoming = s.accept( );
+				Socket incoming = serverSocket.accept( );
 				new ThreadedDataObjectHandler(incoming).start();
-			} 
+			}
 		}
-		catch (Exception e) {
-			System.out.println(e);
-		} 
+		catch (IOException e) {
+			System.out.println("Exception in the Server class: " +e.getMessage());
+		} 	
 	}
 }
+
+
 class ThreadedDataObjectHandler extends Thread {
 	ArrayList<Member> members = null;
 	private Socket incoming; 
@@ -25,23 +29,26 @@ class ThreadedDataObjectHandler extends Thread {
 	}
 	@SuppressWarnings("unchecked")
 	public void run() { 
-		try {
-			ObjectInputStream in =
-					new ObjectInputStream(incoming.getInputStream());
-			ObjectOutputStream out =
-					new ObjectOutputStream(incoming.getOutputStream());
-			members = (ArrayList<Member>)in.readObject(); 
 
-			DbInteraction dbCall = new DbInteraction(members);
-			ArrayList<Member> dbResp = dbCall.buildQuery();
-			
-			out.writeObject(dbResp);
-			in.close();
-			out.close();
-			incoming.close();
+		ObjectInputStream in = null;
+		ObjectOutputStream out = null;
+		try {
+			in = new ObjectInputStream(incoming.getInputStream());
+			out = new ObjectOutputStream(incoming.getOutputStream());
+			members = (ArrayList<Member>)in.readObject();
+			if(members.get(0).getMessage().equals("close")) {
+				System.exit(0);
+			}
+			else{
+				DbInteraction dbCall = new DbInteraction(members);
+				ArrayList<Member> dbResp = dbCall.buildQuery();
+				out.writeObject(dbResp);
+				in.close();
+				out.close();
+				incoming.close();
+			}
+		} catch (ClassNotFoundException | SQLException | IOException e) {
+			System.out.println("Exception in the Server class: " +e.getMessage());
 		}
-		catch (Exception e) { 
-			e.printStackTrace();
-		} 
 	}
 }

@@ -7,10 +7,7 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
@@ -47,8 +44,6 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 	public static final String storeDir = "Resources";
 	public static final String storeFile = "MemberRecord.txt";
 
-
-
 	private JButton button_add, button_edit, button_delete, button_cancel, button_done, button_logout;
 	private JLabel label_full_name, label_email, label_phone_num, label_dob, label_member_list;
 	private static JTextField text_full_name, text_email, text_phone_num, text_dob;
@@ -69,7 +64,7 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLayout(new FlowLayout(FlowLayout.LEFT,10,10));
 
-		recordList = readApp(this.members);
+		recordList = ClientUtil.actionPerform(this.members, "load");
 		if(recordList == null){
 			recordList = new ArrayList<Member>();
 		}
@@ -80,7 +75,6 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 		label_dob = new JLabel("Enter Date Of Birth:");
 		label_member_list = new JLabel("Member List");
 		label_member_list.setFont(new Font("Serif", Font.BOLD, 14));
-		//label_member_list.setAlignmentY(BOTTOM_ALIGNMENT);
 		label_member_list.setAlignmentY(LEFT_ALIGNMENT);
 
 
@@ -259,68 +253,6 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 	}
 
 
-	public static void writeApp(ArrayList<Member> gapp) throws IOException{
-		ObjectOutputStream oos = new ObjectOutputStream(
-				new FileOutputStream(storeDir + File.separator + storeFile));
-		oos.writeObject(gapp);
-	}
-
-
-	public static ArrayList<Member> readApp(ArrayList<Member> members)
-			throws IOException, ClassNotFoundException {
-
-		//		File f = new File(storeDir + File.separator + storeFile);
-		//		ArrayList<Member> gapp = null;
-		//
-		//		try {
-		//			if( f.length() == 0 ){
-		//				f.createNewFile();
-		//			} else {
-		//				ObjectInputStream ois = new ObjectInputStream(new FileInputStream(f));
-		//				gapp = (ArrayList<Member>) ois.readObject();
-		//			}
-		//		} catch (IOException e) {
-		//			e.printStackTrace();
-		//		}
-		members.get(0).setMessage("load");
-		Client client = new Client(members);
-		ArrayList<Member> memberFromServer = client.startClient();
-		memberFromServer.remove(0);
-
-		return memberFromServer;
-	}
-
-	public static ArrayList<Member> addMember(ArrayList<Member> members)
-			throws IOException, ClassNotFoundException {
-		members.get(0).setMessage("add");
-		Client client = new Client(members);
-		ArrayList<Member> memberFromServer = client.startClient();
-		memberFromServer.remove(0);
-
-		return memberFromServer;
-	}
-
-	public static ArrayList<Member> deleteMember(ArrayList<Member> members)
-			throws IOException, ClassNotFoundException {
-		members.get(0).setMessage("delete");		
-		Client client = new Client(members);
-		ArrayList<Member> memberFromServer = client.startClient();
-		memberFromServer.remove(0);
-
-		return memberFromServer;
-	}
-
-	public static ArrayList<Member> updateMember(ArrayList<Member> members)
-			throws IOException, ClassNotFoundException {
-		members.get(0).setMessage("update");
-		Client client = new Client(members);
-		ArrayList<Member> memberFromServer = client.startClient();
-		memberFromServer.remove(0);
-
-		return memberFromServer;
-	}
-
-
 	//This method is required by ListSelectionListener.
 	public void valueChanged(ListSelectionEvent e) {
 		if (e.getValueIsAdjusting() == false) {
@@ -354,7 +286,7 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 	class LogoutListner implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			dispose();
-			new LoginView().main(null);
+			Client.main(null);
 		}
 	}
 
@@ -390,7 +322,6 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 
 			int indexOfEditedMember = list.getSelectedIndex();
 
-			System.out.println("####"+newMember.compareTo(recordList.get(indexOfEditedMember)));
 			if(newMember.compareTo(recordList.get(indexOfEditedMember)) == 0){
 
 				newMember.setMemberId(recordList.get(indexOfEditedMember).getMemberId());
@@ -400,12 +331,9 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 				ArrayList<Member> members = new ArrayList<Member>();
 
 				members.add(recordList.get(indexOfEditedMember));
-				try {
-					updateMember(members);
-				} catch (ClassNotFoundException | IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+
+				ClientUtil.actionPerform(members, "update");
+
 
 
 			}
@@ -431,12 +359,9 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 						ArrayList<Member> members = new ArrayList<Member>();
 
 						members.add(recordList.get(index));
-						try {
-							updateMember(members);
-						} catch (ClassNotFoundException | IOException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
+
+						ClientUtil.actionPerform(members, "update");
+
 
 						listModel.add(index, newMember.getFullname());
 						list.setSelectedIndex(index);
@@ -449,12 +374,9 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 						ArrayList<Member> members = new ArrayList<Member>();
 
 						members.add(recordList.get(index));
-						try {
-							updateMember(members);
-						} catch (ClassNotFoundException | IOException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
+
+						ClientUtil.actionPerform(members, "update");
+
 
 						recordList.remove(indexOfEditedMember);
 						listModel.remove(indexOfEditedMember);
@@ -544,12 +466,9 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 
 			ArrayList<Member> members = new ArrayList<Member>();
 			members.add(recordList.get(index));
-			try {
-				deleteMember(members);
-			} catch (ClassNotFoundException | IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+
+			ClientUtil.actionPerform(members, "delete");
+
 
 			recordList.remove(index);
 
@@ -631,12 +550,9 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 			newMember.setMemberId(new Random().nextInt(1000)+1);
 
 			members.add(newMember);
-			try {
-				addMember(members);
-			} catch (ClassNotFoundException | IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+
+			ClientUtil.actionPerform(members, "add");
+
 			recordList.add(index, newMember);
 
 			listModel.insertElementAt(newMember.getFullname(), index);
@@ -696,18 +612,5 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 			}
 			return false;
 		}
-	}
-	/**
-	 * @return the member
-	 */
-	public ArrayList<Member> getMembers() {
-		return members;
-	}
-
-	/**
-	 * @param member the member to set
-	 */
-	public void setMembers(ArrayList<Member> members) {
-		this.members = members;
 	}
 }
