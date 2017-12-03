@@ -50,14 +50,18 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 	private static JTextArea text_details;
 	private ArrayList<Member> members;
 	private Member member;
+	private int selectedIndex;
 	private JList<String> list;
 	private DefaultListModel<String> listModel;
 	public static ArrayList<Member> recordList;
+	
 
 	public MainScreen(ArrayList<Member> members, Member member){
 		super("Member Administration System");
 		this.members=members;
+		//System.out.println(this.member.getFullname());
 		this.member = member;
+		this.selectedIndex = 0;
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLayout(new FlowLayout(FlowLayout.LEFT,10,10));
 
@@ -87,7 +91,7 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 		button_logout = new JButton("Logout");
 		button_logout.setAlignmentX(RIGHT_ALIGNMENT);
 
-		HireListener hireListener = new HireListener(button_add);
+		AddListener hireListener = new AddListener(button_add);
 		button_add.addActionListener(hireListener);
 		button_add.setEnabled(false);
 		text_full_name.getDocument().addDocumentListener(hireListener);
@@ -95,7 +99,7 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 		text_phone_num.addActionListener(hireListener);
 		text_dob.addActionListener(hireListener);
 
-		button_delete.addActionListener(new FireListener());
+		button_delete.addActionListener(new DeleteListener());
 		button_edit.addActionListener(new EditListener());
 		button_cancel.addActionListener(new CancelListener());
 		button_done.addActionListener(new DoneListener());
@@ -113,16 +117,12 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 		JPanel bottomRight = createBottomRight();
 		JPanel rightPanel = createRightPanel();
 		JPanel mainRightPanel = createMainRightPanel(topRight, rightPanel, bottomRight);
-		JPanel leftPanel = createLeftPanel();
 		JPanel leftButtonPane = createLeftButtonPane();
-
-		if(this.member.getType().equalsIgnoreCase("admin")) {
-			leftPanel.add(leftButtonPane);
-		}
-
+		JPanel leftPanel = createLeftPanel(leftButtonPane);
+		
 		add(leftPanel);
 		add(mainRightPanel);
-
+		
 		pack();
 		setVisible(true);
 	}
@@ -169,23 +169,23 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 	private JPanel createButtonPane() {
 		JPanel buttonPane = new JPanel();
 		buttonPane.setLayout(new BoxLayout(buttonPane,BoxLayout.LINE_AXIS));
-		if(this.member.getType().equalsIgnoreCase("admin")) {
-			buttonPane.add(button_cancel);
-			buttonPane.add(Box.createHorizontalStrut(5));
-			buttonPane.add(button_done);
-			buttonPane.add(Box.createHorizontalStrut(5));
-			buttonPane.add(button_add);
-		}
+
+		buttonPane.add(button_cancel);
+		buttonPane.add(Box.createHorizontalStrut(5));
+		buttonPane.add(button_done);
+		buttonPane.add(Box.createHorizontalStrut(5));
+		buttonPane.add(button_add);
+
 		buttonPane.add(button_logout);
 		buttonPane.setBorder(BorderFactory.createEmptyBorder(10,5,5,5));
 		return buttonPane;
 	}
 
-	private JPanel createLeftPanel() {
+	private JPanel createLeftPanel(JPanel leftButtonPane) {
 		JPanel leftPanel = new JPanel();
-		leftPanel.add(label_member_list);	
+		//leftPanel.add(label_member_list);	
 		leftPanel.setLayout(new BoxLayout(leftPanel,BoxLayout.Y_AXIS));
-
+		
 		listModel = new DefaultListModel<String>();
 
 		// inflate listModel
@@ -198,14 +198,18 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 
 		list = new JList<String>(listModel);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		list.setSelectedIndex(0);
+		list.setSelectedIndex(this.selectedIndex);
 		list.addListSelectionListener(this);
 		list.setVisibleRowCount(5);
+		list.setToolTipText("Member List");
 
 		JScrollPane listScrollPane = new JScrollPane(list, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		listScrollPane.setPreferredSize(new Dimension(200,280));
+		listScrollPane.setPreferredSize(new Dimension(200,250));
 
 		leftPanel.add(listScrollPane);
+
+		leftPanel.add(leftButtonPane);
+
 		return leftPanel;
 	}
 
@@ -228,9 +232,9 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 		JPanel mainRightPanel = new JPanel();
 		mainRightPanel.setLayout(new BoxLayout(mainRightPanel,BoxLayout.Y_AXIS));
 		mainRightPanel.add(topRight);
-		if(this.member.getType().equalsIgnoreCase("admin")) {
-			mainRightPanel.add(rightPanel);
-		}
+
+		mainRightPanel.add(rightPanel);
+		
 		mainRightPanel.add(bottomRight);
 
 		JPanel buttonPane = createButtonPane();
@@ -246,13 +250,27 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 			if (list.getSelectedIndex() == -1) {
 				text_details.setText("");
 
-			} else {
-				String member,email,phone,dob;
+			} else if(this.member.getMemberId()!=recordList.get(list.getSelectedIndex()).getMemberId() && !this.member.getType().equalsIgnoreCase("admin")) {
+				System.out.println("####" +this.member.getMemberId());
+				
+				/*
+				if(this.member.getType().equalsIgnoreCase("member")) {
+				JPanel topRight = createTopRight();
+				mainRightPanel.add(topRight);
+				add(mainRightPanel);
+				pack();
+				setVisible(true);
+				}else{
+
+				}*/
+
+			}
+			else {
+				String member, email, phone, dob;
 				member = recordList.get(list.getSelectedIndex()).getFullname();
 				email = recordList.get(list.getSelectedIndex()).getEmail();
 				phone = recordList.get(list.getSelectedIndex()).getPhoneNo();
 				dob =recordList.get(list.getSelectedIndex()).getDob();
-
 				text_details.setText(" Full Name: " + member +  "\n Email: " + email + "\n PhoneNo : " + phone + "\n DOB: " + dob);
 			}
 		}
@@ -380,7 +398,6 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 		}
 	}
 
-
 	class EditListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			text_log.setText("");
@@ -406,7 +423,7 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 	}
 
 	//This method can be called only if there's a valid selection to remove whatever's selected.
-	class FireListener implements ActionListener {
+	class DeleteListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			if(listModel.size() ==0){
 				return;
@@ -448,11 +465,11 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 	}
 
 	//This listener is shared by the text field and the hire button.
-	class HireListener implements ActionListener, DocumentListener {
+	class AddListener implements ActionListener, DocumentListener {
 		private JButton button;
 		private boolean alreadyEnabled = false;
 
-		public HireListener(JButton button) {
+		public AddListener(JButton button) {
 			this.button = button;
 		}
 

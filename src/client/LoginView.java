@@ -49,8 +49,6 @@ public class LoginView extends JFrame implements ActionListener{
 	public void actionPerformed(ActionEvent event){
 		String valueUserName=txtUserName.getText();
 		String valuePassword=txtPassword.getText();
-		System.out.println(valueUserName);
-		System.out.println(valuePassword);
 		ArrayList<Member> members = new ArrayList<Member>();
 		Member member = new Member();
 		member.setMessage("login");
@@ -61,12 +59,11 @@ public class LoginView extends JFrame implements ActionListener{
 		ArrayList<Member> memberFromServer = client.startClient();
 		if(memberFromServer.get(0).getMessage().equals("success")) {
 			String cmd = event.getActionCommand();
-
 			if(cmd.equals("Open")) {
 				dispose();
-				MainScreen design=null;
-				design = new MainScreen(members, memberFromServer.get(0));
-				design.addWindowListener(new java.awt.event.WindowAdapter() {
+				MainScreen mainscreen=null;
+				mainscreen = new MainScreen(members, memberFromServer.get(0));
+				mainscreen.addWindowListener(new java.awt.event.WindowAdapter() {
 					public void windowClosing(WindowEvent winEvt) {			            
 						ClientUtil.closeTheWindow();
 					}

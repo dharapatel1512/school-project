@@ -92,7 +92,7 @@ public class DbInteraction {
 
 			ps.close();
 			conn.close();
-			break; // optional
+			break;
 
 		case "update" :
 			ps=conn.prepareStatement("UPDATE member_details.members SET username =?, email=?, phone_num=? WHERE member_id=?");

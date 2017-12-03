@@ -8,7 +8,8 @@ public class ThreadedDataObjectServer {
 	public static void main(String[] args ) {
 
 		try {
-			ServerSocket serverSocket = new ServerSocket(3003); 
+			ServerSocket serverSocket = new ServerSocket(3010); 
+			System.out.println("Server started");
 			while(true) {
 				Socket incoming = serverSocket.accept( );
 				new ThreadedDataObjectHandler(incoming).start();

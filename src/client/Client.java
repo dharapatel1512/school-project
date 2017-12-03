@@ -24,7 +24,7 @@ public class Client {
 		ObjectInputStream inFromServer = null;
 
 		try {
-			socketToServer = new Socket("localhost", 3003); 
+			socketToServer = new Socket("localhost", 3010); 
 			//Socket socketToServer = new Socket("afs4.njit.edu", 3003);
 			outToServer = new ObjectOutputStream(socketToServer.getOutputStream());
 			inFromServer = new ObjectInputStream(socketToServer.getInputStream()); 
