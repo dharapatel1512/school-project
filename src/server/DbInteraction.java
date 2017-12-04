@@ -7,6 +7,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+/**
+ * @author Dharaben Patel, Nidhi Patel
+ */
 public class DbInteraction {
 	ArrayList<Member> members;
 	DbInteraction(ArrayList<Member> members){
@@ -21,8 +24,8 @@ public class DbInteraction {
 		ResultSet rs;
 		switch(members.get(0).getMessage()) {
 		case "login" :
-			ps=conn.prepareStatement("SELECT member_id, username, password, type From member_details.Members WHERE username=? AND password=?");
-			//ps=conn.prepareStatement("SELECT member_id, username, password, type From Members WHERE username=? AND password=?");
+			//ps=conn.prepareStatement("SELECT member_id, username, password, type From member_details.Members WHERE username=? AND password=?");
+			ps=conn.prepareStatement("SELECT member_id, username, password, type From Members WHERE username=? AND password=?");
 			ps.setString(1, this.members.get(0).getUsername());
 			ps.setString(2, this.members.get(0).getPassword());
 
@@ -44,8 +47,8 @@ public class DbInteraction {
 			break; 
 
 		case "load" :
-			ps=conn.prepareStatement("SELECT * From member_details.members");
-			//ps=conn.prepareStatement("SELECT * From Members");
+			//ps=conn.prepareStatement("SELECT * From member_details.members");
+			ps=conn.prepareStatement("SELECT * From Members");
 			rs = ps.executeQuery();
 
 			while(rs.next()){
@@ -73,8 +76,8 @@ public class DbInteraction {
 			Calendar calendar = Calendar.getInstance();
 			java.sql.Date startDate = new java.sql.Date(calendar.getTime().getTime());
 
-			ps=conn.prepareStatement("INSERT INTO member_details.members (member_id, username, password, email, phone_num, birth_date, type) VALUES (?, ?, ?, ?, ?, ?, ?)");
-			//ps=conn.prepareStatement("INSERT INTO Members (member_id, username, password, email, phone_num, birth_date, type) VALUES (?, ?, ?, ?, ?, ?, ?)");
+			//ps=conn.prepareStatement("INSERT INTO member_details.members (member_id, username, password, email, phone_num, birth_date, type) VALUES (?, ?, ?, ?, ?, ?, ?)");
+			ps=conn.prepareStatement("INSERT INTO Members (member_id, username, password, email, phone_num, birth_date, type) VALUES (?, ?, ?, ?, ?, ?, ?)");
 			ps.setInt(1, this.members.get(0).getMemberId());
 			ps.setString(2, this.members.get(0).getFullname());
 			ps.setString(3, "123456");
@@ -95,8 +98,8 @@ public class DbInteraction {
 			break;
 
 		case "update" :
-			ps=conn.prepareStatement("UPDATE member_details.members SET username =?, email=?, phone_num=? WHERE member_id=?");
-			//ps=conn.prepareStatement("UPDATE Members SET username =?, email=?, phone_num=? WHERE member_id=?");
+			//ps=conn.prepareStatement("UPDATE member_details.members SET username =?, email=?, phone_num=? WHERE member_id=?");
+			ps=conn.prepareStatement("UPDATE Members SET username =?, email=?, phone_num=? WHERE member_id=?");
 			ps.setString(1, this.members.get(0).getFullname());
 			ps.setString(2, this.members.get(0).getEmail());
 			ps.setString(3, this.members.get(0).getPhoneNo());
@@ -114,8 +117,8 @@ public class DbInteraction {
 			break;
 
 		case "delete" :
-			ps=conn.prepareStatement("DELETE FROM member_details.members WHERE member_id=?");
-			//ps=conn.prepareStatement("DELETE FROM Members WHERE member_id=?");
+			//ps=conn.prepareStatement("DELETE FROM member_details.members WHERE member_id=?");
+			ps=conn.prepareStatement("DELETE FROM Members WHERE member_id=?");
 			ps.setInt(1, this.members.get(0).getMemberId());
 
 			int rs4 = ps.executeUpdate();

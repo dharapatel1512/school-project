@@ -6,6 +6,9 @@ import javax.swing.JButton;
 
 import server.Member;
 
+/**
+ * @author Dharaben Patel, Nidhi Patel
+ */
 public class ClientUtil {
 	public static void closeTheWindow() {
 		Member tempMember = new Member();

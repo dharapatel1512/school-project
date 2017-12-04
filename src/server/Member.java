@@ -1,10 +1,10 @@
 package server;
 
-
+/**
+ * @author Dharaben Patel, Nidhi Patel
+ */
 public class Member extends DataObject implements Comparable<Member>{
-
 	private static final long serialVersionUID = 1L;
-
 	private int memberId;
 	private String username;
 	private String password;

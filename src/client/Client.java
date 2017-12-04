@@ -11,6 +11,9 @@ import javax.swing.SwingUtilities;
 
 import server.Member;
 
+/**
+ * @author Dharaben Patel, Nidhi Patel
+ */
 public class Client {
 
 	ArrayList<Member> members;
@@ -24,8 +27,8 @@ public class Client {
 		ObjectInputStream inFromServer = null;
 
 		try {
-			socketToServer = new Socket("localhost", 3010); 
-			//Socket socketToServer = new Socket("afs4.njit.edu", 3003);
+			//socketToServer = new Socket("localhost", 3007); 
+			socketToServer = new Socket("afs4.njit.edu", 3007);
 			outToServer = new ObjectOutputStream(socketToServer.getOutputStream());
 			inFromServer = new ObjectInputStream(socketToServer.getInputStream()); 
 			outToServer.writeObject(this.members);
@@ -35,7 +38,7 @@ public class Client {
 			socketToServer.close();
 		} catch (ClassNotFoundException | IOException e) {
 			
-			System.out.println("Server Connection is closed now. Thank you :)");
+			System.out.println("Server Connection is closed now. Thank you :)" );
 		}
 
 		return this.members;

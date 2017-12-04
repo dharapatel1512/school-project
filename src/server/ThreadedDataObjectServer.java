@@ -4,11 +4,13 @@ import java.net.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+/**
+ * @author Dharaben Patel, Nidhi Patel
+ */
 public class ThreadedDataObjectServer { 
 	public static void main(String[] args ) {
-
 		try {
-			ServerSocket serverSocket = new ServerSocket(3010); 
+			ServerSocket serverSocket = new ServerSocket(3007); 
 			System.out.println("Server started");
 			while(true) {
 				Socket incoming = serverSocket.accept( );
