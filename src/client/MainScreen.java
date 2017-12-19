@@ -33,21 +33,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 
-
 import javax.swing.*;
-import javax.swing.event.*;
 import javax.swing.table.*;
-import javax.swing.RowFilter;
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.border.*;
 
 
-import java.net.*;
-
-import java.io.*;
-
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import server.Member;
 
 /**
@@ -299,7 +290,7 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 
             } else if(this.member.getMemberId()!=recordList.get(table.getSelectedRow()).getMemberId() && !(this.member.getType().equals("admin"))) {
                 hideIfMember();
-                //pack();
+                pack();
             }
             else {
                 button_cancel.setVisible(true);
@@ -320,7 +311,7 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
                 phone = recordList.get(selectedRowIndex).getPhoneNo();
                 dob =recordList.get(selectedRowIndex).getDob();
                 text_details.setText(" Full Name: " + member +  "\n Email Address: " + email + "\n Phone No: " + phone + "\n DOB: " + dob);
-                //pack();
+                pack();
 
 
             }
@@ -570,10 +561,15 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
             members.add(newMember);
 
             ClientUtil.actionPerform(members, "add");
+            ClientUtil.actionPerform(members, "load");
 
             recordList.add(newMember);
 
             model.addRow(new Object[]{newMember.getFullname()});
+
+
+            ClientUtil.actionPerform(members, "getUser");
+
 
             //Reset the text field.
             text_full_name.requestFocusInWindow();
