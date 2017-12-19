@@ -66,7 +66,7 @@ public class LoginView extends JFrame implements ActionListener{
 				dispose();
 				MainScreen mainscreen=null;
 				mainscreen = new MainScreen(members, memberFromServer.get(0));
-				mainscreen.setSize(565,335);
+				mainscreen.setSize(570,335);
 				mainscreen.addWindowListener(new java.awt.event.WindowAdapter() {
 					public void windowClosing(WindowEvent winEvt) {			            
 						ClientUtil.closeTheWindow();

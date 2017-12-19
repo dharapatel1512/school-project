@@ -258,7 +258,7 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 
 			} else if(this.member.getMemberId()!=recordList.get(list.getSelectedIndex()).getMemberId() && !(this.member.getType().equals("admin"))) {
 				hideIfMember();
-				pack();
+				//pack();
 			}
 			else {
 				button_cancel.setVisible(true);
@@ -276,7 +276,7 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 				phone = recordList.get(list.getSelectedIndex()).getPhoneNo();
 				dob =recordList.get(list.getSelectedIndex()).getDob();
 				text_details.setText(" Full Name: " + member +  "\n Email: " + email + "\n PhoneNo : " + phone + "\n DOB: " + dob);
-				pack();
+				//pack();
 			}
 		}
 	}
