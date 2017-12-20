@@ -33,21 +33,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 
-
 import javax.swing.*;
-import javax.swing.event.*;
 import javax.swing.table.*;
-import javax.swing.RowFilter;
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.border.*;
 
 
-import java.net.*;
-
-import java.io.*;
-
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import server.Member;
 
 /**
@@ -56,8 +47,6 @@ import server.Member;
 
 public class MainScreen extends JFrame implements ListSelectionListener, Serializable{
     private static final long serialVersionUID=1L;
-    public static final String storeDir = "Resources";
-    public static final String storeFile = "MemberRecord.txt";
     private JButton button_add, button_edit, button_delete, button_cancel, button_done, button_logout;
     private JLabel label_full_name, label_email, label_phone_num, label_dob, label_member_list;
     private static HintTextField text_full_name, text_email, text_phone_num, text_dob;
@@ -97,6 +86,13 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
         text_full_name = new HintTextField(" John");
         text_email = new HintTextField(" john@njit.edu");
         text_phone_num = new HintTextField(" 9876543210");
+        text_phone_num.addKeyListener(new KeyAdapter() {
+            public void keyTyped(KeyEvent e) { 
+                if (text_phone_num.getText().length() >= 10 ) { // limit textfield to 10 characters
+                	e.consume();
+                	} 
+            }  
+        });
         text_dob = new HintTextField("	MM/DD/YYYY");
 
         button_add = new JButton("Add");
@@ -272,8 +268,8 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
             }
         });
         leftTopPane.add(searchField);
-        leftTopPane.add(Box.createHorizontalStrut(5));
-        leftTopPane.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        //leftTopPane.add(Box.createHorizontalStrut(5));
+        leftTopPane.setBorder(BorderFactory.createEmptyBorder(0,0,5,0));
         return leftTopPane;
     }
 
@@ -301,7 +297,6 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
 
             } else if(this.member.getMemberId()!=recordList.get(table.getSelectedRow()).getMemberId() && !(this.member.getType().equals("admin"))) {
                 hideIfMember();
-                //pack();
             }
             else {
                 button_cancel.setVisible(true);
@@ -322,9 +317,6 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
                 phone = recordList.get(selectedRowIndex).getPhoneNo();
                 dob =recordList.get(selectedRowIndex).getDob();
                 text_details.setText(" Full Name: " + member +  "\n Email Address: " + email + "\n Phone No: " + phone + "\n DOB: " + dob);
-                //pack();
-
-
             }
         }
     }
@@ -572,10 +564,15 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
             members.add(newMember);
 
             ClientUtil.actionPerform(members, "add");
+            //ClientUtil.actionPerform(members, "load");
 
             recordList.add(newMember);
 
             model.addRow(new Object[]{newMember.getFullname()});
+
+
+            ClientUtil.actionPerform(members, "getUser");
+
 
             //Reset the text field.
             text_full_name.requestFocusInWindow();

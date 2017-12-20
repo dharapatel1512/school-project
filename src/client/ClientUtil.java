@@ -4,6 +4,15 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import java.net.Socket;
+import java.net.UnknownHostException;
+
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -25,15 +34,6 @@ public class ClientUtil {
 		Client client = new Client(members);
 		client.startClient();
 		System.exit(0);
-	}
-
-	public static ArrayList<Member> actionPerform(ArrayList<Member> members, String action){
-		members.get(0).setMessage(action);
-		Client client = new Client(members);
-		ArrayList<Member> memberFromServer = client.startClient();
-		memberFromServer.remove(0);
-
-		return memberFromServer;
 	}
 
 	public static int getIndex(ArrayList<Member> recordedMembers, Member newMember){
@@ -62,6 +62,100 @@ public class ClientUtil {
 			button.setFocusPainted(true);
 		}
 	}
+	
+	public static ArrayList<Member> actionPerform(ArrayList<Member> members, String action){
+        members.get(0).setMessage(action);
+        Client client = new Client(members);
+        ArrayList<Member> memberFromServer = client.startClient();
+
+        if(action.equals("getUser")){
+            String email = memberFromServer.get(memberFromServer.size()-1).getEmail();
+            String username = memberFromServer.get(memberFromServer.size()-1).getFullname();
+            String password = memberFromServer.get(memberFromServer.size() -1).getPassword();
+
+
+
+            Socket smtpSocket = null;
+            DataOutputStream os = null;
+            BufferedReader is = null;
+
+            try {
+                System.out.println("Start");
+                smtpSocket = new Socket("mail.njit.edu", 25);
+                System.out.println("Connected to mail.njit.edu");
+                os = new DataOutputStream(smtpSocket.getOutputStream());
+                is = new BufferedReader(new InputStreamReader(smtpSocket.getInputStream()));
+
+            } catch (UnknownHostException e) {
+                System.err.println("Don't know about host: hostname");
+            } catch (IOException e) {
+                System.err.println("Couldn't get I/O for the connection to: hostname");
+            }
+
+            if (smtpSocket != null && os != null && is != null) {
+                try {
+
+                    String response;
+
+                    String command = "HELO mail.njit.edu\n";
+                    //System.out.print(command);
+                    os.write(command.getBytes("US-ASCII"));
+                    response = is.readLine();
+                    System.out.println("Server " + response);
+
+                    command = "MAIL FROM: dp582@njit.edu\n";
+                    // System.out.print(command);
+                    os.write(command.getBytes("US-ASCII"));
+                    response = is.readLine();
+                    System.out.println("Server " + response);
+
+                    command = "RCPT TO: "+ email + "\n";
+                    //System.out.print(command);
+                    os.write(command.getBytes("US-ASCII"));
+                    response = is.readLine();
+                    System.out.println("Server " + response);
+
+                    command = "DATA\n";
+                    //System.out.print(command);
+                    os.write(command.getBytes("US-ASCII"));
+                    response = is.readLine();
+                    System.out.println("Server " + response);
+
+                    command = "Hi "+ username +", your password is " + password +".\n";
+                    //System.out.print(command);
+                    os.write(command.getBytes("US-ASCII"));
+                    response = is.readLine();
+                    System.out.println("Server " + response);
+
+                    command = ".\n";
+                    //System.out.print(command);
+                    os.write(command.getBytes("US-ASCII"));
+
+
+                    command = "QUIT\n";
+                    //System.out.print(command);
+                    os.write(command.getBytes("US-ASCII"));
+
+                    response = is.readLine();
+                    System.out.println("Server " + response);
+
+
+                    os.close();
+                    is.close();
+                    smtpSocket.close();
+                } catch (UnknownHostException e) {
+                    System.err.println("Trying to connect to unknown host: " + e);
+                } catch (IOException e) {
+                    System.err.println("IOException:  " + e);
+                }
+            }
+
+        }
+
+        memberFromServer.remove(0);
+        return memberFromServer;
+    }
+
 }
 
 class HintTextField extends JTextField implements FocusListener{
@@ -96,6 +190,7 @@ class HintTextField extends JTextField implements FocusListener{
     }
 }
 
+
 class HintTextFieldUI extends BasicTextFieldUI implements FocusListener {
 
 	private String hint;
@@ -106,6 +201,12 @@ class HintTextFieldUI extends BasicTextFieldUI implements FocusListener {
 		this.hint = hint;
 		this.hideOnFocus = hideOnFocus;
 		this.color = color;
+	}
+	
+	public void repaint() {
+		if(getComponent()!=null) {
+			getComponent().repaint();
+		}
 	}
 
 	@Override
@@ -126,14 +227,14 @@ class HintTextFieldUI extends BasicTextFieldUI implements FocusListener {
 	@Override
 	public void focusGained(FocusEvent e) {
 		if(hideOnFocus) {
-			getComponent().repaint();
+			repaint();
 		}
 
 	}
 	@Override
 	public void focusLost(FocusEvent e) {
 		if(hideOnFocus) {
-			getComponent().repaint();
+			repaint();
 		}
 	}
 	@Override
@@ -147,3 +248,4 @@ class HintTextFieldUI extends BasicTextFieldUI implements FocusListener {
 		getComponent().removeFocusListener(this);
 	}
 }
+
