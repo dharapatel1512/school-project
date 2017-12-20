@@ -60,7 +60,7 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
     public static final String storeFile = "MemberRecord.txt";
     private JButton button_add, button_edit, button_delete, button_cancel, button_done, button_logout;
     private JLabel label_full_name, label_email, label_phone_num, label_dob, label_member_list;
-    private static JTextField text_full_name, text_email, text_phone_num, text_dob;
+    private static HintTextField text_full_name, text_email, text_phone_num, text_dob;
     private static JTextArea text_log;
     private static JTextArea text_details;
     private ArrayList<Member> members;
@@ -94,10 +94,10 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
         label_member_list.setFont(new Font("Serif", Font.BOLD, 14));
         label_member_list.setAlignmentY(LEFT_ALIGNMENT);
 
-        text_full_name = new JTextField("");
-        text_email = new JTextField("");
-        text_phone_num = new JTextField("");
-        text_dob = new JTextField("");
+        text_full_name = new HintTextField(" John");
+        text_email = new HintTextField(" john@njit.edu");
+        text_phone_num = new HintTextField(" 9876543210");
+        text_dob = new HintTextField("	MM/DD/YYYY");
 
         button_add = new JButton("Add");
         button_add.setEnabled(false);
@@ -228,32 +228,9 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
         JScrollPane listScrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         listScrollPane.setPreferredSize(new Dimension(150,230));
 
-        JTextField searchField = new JTextField("Search Members");
-        searchField.setFont(new Font("Serif", Font.ITALIC, 12));
-
-        searchField.addMouseListener(new MouseAdapter(){
-            @Override
-            public void mouseClicked(MouseEvent e){
-                searchField.setText("");
-            }
-        });
-
-        searchField.addKeyListener(new KeyAdapter() {
-            public void keyReleased(KeyEvent e) {
-               String text = searchField.getText();
-               for(int i = 0; i < model.getRowCount(); i++){
-
-                   if(text.trim().equalsIgnoreCase(model.getValueAt(i,0).toString().trim())){
-                       table.setRowSelectionInterval(0,i);
-                       table.getSelectionModel().setSelectionInterval(0, i);
-                       table.scrollRectToVisible(new Rectangle(table.getCellRect(i, 0, true)));
-                   }
-               }
-            }
-        });
-
-        leftPanel.add(searchField);
-        table.setPreferredSize(new Dimension(150,230));
+        table.setPreferredSize(new Dimension(150,210));
+        
+        leftPanel.add(createLeftTopPane());
         leftPanel.add(table);
 
         leftPanel.add(leftButtonPane);
@@ -273,6 +250,31 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
         leftButtonPane.add(Box.createHorizontalStrut(5));
         leftButtonPane.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         return leftButtonPane;
+    }
+    
+    /* Panel on the left half of the base container*/
+    private JPanel createLeftTopPane() {
+        JPanel leftTopPane = new JPanel();
+        leftTopPane.setLayout(new BoxLayout(leftTopPane, BoxLayout.LINE_AXIS));
+        HintTextField searchField = new HintTextField(" Search Members");
+
+        searchField.addKeyListener(new KeyAdapter() {
+            public void keyReleased(KeyEvent e) {
+               String text = searchField.getText();
+               for(int i = 0; i < model.getRowCount(); i++){
+
+                   if(text.trim().equalsIgnoreCase(model.getValueAt(i,0).toString().trim())){
+                       table.setRowSelectionInterval(0,i);
+                       table.getSelectionModel().setSelectionInterval(0, i);
+                       table.scrollRectToVisible(new Rectangle(table.getCellRect(i, 0, true)));
+                   }
+               }
+            }
+        });
+        leftTopPane.add(searchField);
+        leftTopPane.add(Box.createHorizontalStrut(5));
+        leftTopPane.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        return leftTopPane;
     }
 
     private JPanel createMainRightPanel(JPanel topRight, JPanel rightPanel, JPanel bottomRight) {
