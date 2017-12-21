@@ -52,9 +52,9 @@ public class Client {
 			@Override
 			public void run(){
 				LoginView frame=new LoginView();
-				frame.setSize(450,100);
+				frame.setSize(350,100);
 				frame.setVisible(true);
-				frame.setAlwaysOnTop(true);
+				frame.setLocation(450, 100);
 
 				frame.addWindowListener(new java.awt.event.WindowAdapter() {
 					public void windowClosing(WindowEvent winEvt) {
