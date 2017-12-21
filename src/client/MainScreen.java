@@ -137,8 +137,6 @@ public class MainScreen extends JFrame implements ListSelectionListener, Seriali
         add(mainRightPanel);
 
         hideIfMember();
-
-        pack();
         setVisible(true);
     }
 
