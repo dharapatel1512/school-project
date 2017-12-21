@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Random;
 /**
  * @author Dharaben Patel, Nidhi Patel
@@ -71,7 +70,6 @@ public class DbInteraction {
 				this.members.add(member);
 			}
 
-
 			ps.close();
 			rs.close();
 			conn.close();
@@ -103,9 +101,6 @@ public class DbInteraction {
 			break;
 
 		case "add" :
-			Calendar calendar = Calendar.getInstance();
-			java.sql.Date startDate = new java.sql.Date(calendar.getTime().getTime());
-
 			int randPassword = randomPassword.nextInt(50000) + 1;
 
 			//ps=conn.prepareStatement("INSERT INTO member_details.members (member_id, username, password, email, phone_num, birth_date, type) VALUES (?, ?, ?, ?, ?, ?, ?)");
@@ -115,7 +110,7 @@ public class DbInteraction {
 			ps.setString(3, String.valueOf(randPassword));
 			ps.setString(4, this.members.get(0).getEmail());
 			ps.setString(5, this.members.get(0).getPhoneNo());
-			ps.setDate(6, startDate);
+			ps.setString(6, this.members.get(0).getDob());
 			ps.setString(7, "member");
 
 			int rs2 = ps.executeUpdate();
@@ -131,11 +126,12 @@ public class DbInteraction {
 
 		case "update" :
 			//ps=conn.prepareStatement("UPDATE member_details.members SET username =?, email=?, phone_num=? WHERE member_id=?");
-			ps=conn.prepareStatement("UPDATE Members SET username =?, email=?, phone_num=? WHERE member_id=?");
+			ps=conn.prepareStatement("UPDATE Members SET username =?, email=?, phone_num=?, birth_date=? WHERE member_id=?");
 			ps.setString(1, this.members.get(0).getFullname());
 			ps.setString(2, this.members.get(0).getEmail());
 			ps.setString(3, this.members.get(0).getPhoneNo());
-			ps.setInt(4, this.members.get(0).getMemberId());
+			ps.setString(4, this.members.get(0).getDob());
+			ps.setInt(5, this.members.get(0).getMemberId());
 
 			int rs3 = ps.executeUpdate();
 			if(rs3!=0) {

@@ -2,11 +2,8 @@ package client;
 
 import java.awt.*;
 import java.awt.event.*;
-
 import javax.swing.*;
-
 import java.util.ArrayList;
-
 import server.Member;
 
 /**
@@ -17,7 +14,6 @@ public class LoginView extends JFrame implements ActionListener{
 	JButton btnLogIn, btnClear;
 	JPanel panel;
 	JLabel lblUserName,lblPassword;
-	private static JTextArea text_log;
 	final JTextField  txtUserName,txtPassword;
 
 	public LoginView(){
